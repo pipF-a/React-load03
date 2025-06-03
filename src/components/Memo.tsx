@@ -1,26 +1,83 @@
 import { GoPencil } from "react-icons/go";
 import { CiTrash } from "react-icons/ci";
 import { IoIosSend } from "react-icons/io";
+import { FaRegComment } from "react-icons/fa6";
 import { useState } from "react";
 
+interface MemoItem {
+  id:number;
+  text:string;
+  createdAt:string;
+}
 
+interface ReplyItem {
+  id:number;
+  text:string;
+  createdAt:string;
+}
 
 export const Memo = () => {
-
-  const [items, setItems] = useState<number[]>([1]);
-
-  const handleAddItem = (itemToAdd: number) => {
-    setItems(prevItems => [...prevItems, itemToAdd]);
+  //メモの配列を管理
+  const [memos,setMemos] = useState<MemoItem[]>([])
+  //テキストエリアのテキストを保持
+  const [newMemoText,setNewMemoText] = useState('');
+  //テキストエリアが変更されたら実行する関数
+  const handleChangeText = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setNewMemoText(e.target.value);
   };
 
 
-    /* テキストエリアのテキストを保持する関数*/
-  const [textContent,setTextContent] = useState('');
+  //リプライエリアの表示管理
+  const [reply,setReply] = useState(false);
 
-  /* テキストが変更されたら実行する関数 */
-  const handleChangeText = (e:React.ChangeEvent<HTMLTextAreaElement>) => {
-    setTextContent(e.target.value)
+  //リプライコメント用の配列管理
+  const [replyArray,setReplyArray] = useState<ReplyItem[]>([]);
+  //リプライのテキストを管理
+  const [newReplyText,setNewReplyText] = useState('');
+
+
+  //リプライ機能
+  const toggleReply = () =>{
+    setReply(prev => !prev);
   }
+
+  //リプライのテキストが変更されたら実行
+  const handleChangeReplyText = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setNewReplyText(e.target.value);
+  };
+
+  //新しいリプライメモを追加
+  const handleAddMemo = () =>{
+    if (newMemoText.trim() === '') {
+      return; //空メモ回避
+    }
+    const newMemo: MemoItem = {
+      id: Date.now(), 
+      text: newMemoText,
+      createdAt: new Date().toLocaleString(), 
+    };
+
+    setMemos(prevMemos => [...prevMemos, newMemo]);
+    setNewMemoText(''); // テキストエリアをクリア
+  }
+
+  //新しいリプライを追加
+  const handleAddReply = () =>{
+    if (newReplyText.trim() === '') {
+      return; //空メモ回避
+    }
+    const newReply:ReplyItem =  {
+      id: Date.now(), 
+      text: newReplyText,
+      createdAt: new Date().toLocaleString(), 
+    }
+    setReply(prev => !prev);
+    setReplyArray(prevReplyArray => [...prevReplyArray, newReply]); 
+    setNewReplyText('');
+  }
+
+
+
   return (
     <>
       <div className="max-w-[450px]">
@@ -29,34 +86,43 @@ export const Memo = () => {
         className="w-full rounded-lg p-4 shadow-lg bg-white" 
         rows={4}
         onChange={handleChangeText}
+        value={newMemoText}
         >
         </textarea>
-        <button  className="mt-4 px-8 py-3 bg-emerald-600 text-sm text-white rounded-lg hover:bg-emerald-700"><IoIosSend className="w-4 h-4" /></button>
+        <button onClick={handleAddMemo} className="mt-4 px-8 py-3 bg-emerald-600 text-sm text-white rounded-lg hover:bg-emerald-700"><IoIosSend className="w-4 h-4" /></button>
       </div>
       <ul>
-        {items.map((item: number) => (
-          <li className="mt-6 bg-white border border-gray-300 shadow rounded-lg p-4 w-3/4" key={item} >
-            <div className="flex">
-              <p>時間</p>
+        {memos.map((memo,index)=>(
+          <li className="relative mt-6 bg-white border border-gray-300 shadow rounded-lg p-4 w-2/4" key={index}>
+            <div className="flex justify-between">
+              <p className="text-sm text-gray-500">{memo.createdAt}</p>
               <div className="flex">
                 <button className="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"><GoPencil className="lucide lucide-pen w-4 h-4" /></button>
                 <button className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors"><CiTrash /></button>
               </div>
-            </div>
-
-            <p className="mt-6 whitespace-pre-wrap text-gray-700">{textContent}
-              
-            </p>
+            </div>  
+            <p className="mt-6 whitespace-pre-wrap text-gray-700">{memo.text}</p>
             <hr className="mt-4 border-gray-200" />
-            <button onClick={handleAddItem} className="mt-4 px-8 py-3 bg-emerald-600 text-sm text-white rounded-lg hover:bg-emerald-700"><IoIosSend className="w-4 h-4" /></button>
+            {reply ? <textarea onChange={handleChangeReplyText} placeholder="リプライを入力" className="block mt-4 ml-auto bg-white border border-gray-300 rounded-lg p-4 w-3/4"></textarea> : ''}
+            <ul className="ml-8 space-y-4">
+              {replyArray.map((array,index)=>(
+                <li className="mt-4 p-6 bg-gray-100 rounded-lg space-y-2 ml-auto" key={index}>
+                  <div className="flex justify-between">
+                    <p>{array.createdAt}</p>
+                    <div>
+                      <button className="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"><GoPencil className="lucide lucide-pen w-4 h-4" /></button>
+                      <button className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors"><CiTrash /></button>
+                    </div>
+                  </div>
+                  <p className="mt-6 whitespace-pre-wrap text-gray-700">{array.text}</p>
+                </li>
+              ))}
+            </ul>
+            {reply ? <button onClick={handleAddReply} className="mt-4 px-8 py-3 bg-emerald-600 text-sm text-white rounded-lg hover:bg-emerald-700"><IoIosSend className="w-4 h-4" /></button> : ''}
+            {reply ? '' : <button onClick={toggleReply} className="mt-4 text-emerald-600 hover:text-emerald-700"><FaRegComment className="w-4 h-4" /></button> }
           </li>
         ))}
       </ul>
     </>
-  
   )
 }
-
-
-// ① メモ用の配列を作成(inputしたテキストも含む)
-// ②回す
