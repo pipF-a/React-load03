@@ -19,34 +19,16 @@ interface ReplyItem {
 export const Memo = () => {
   //メモの配列を管理
   const [memos,setMemos] = useState<MemoItem[]>([])
+
   //テキストエリアのテキストを保持
   const [newMemoText,setNewMemoText] = useState('');
+
   //テキストエリアが変更されたら実行する関数
   const handleChangeText = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setNewMemoText(e.target.value);
   };
 
-
-  //リプライエリアの表示管理
-  const [reply,setReply] = useState(false);
-
-  //リプライコメント用の配列管理
-  const [replyArray,setReplyArray] = useState<ReplyItem[]>([]);
-  //リプライのテキストを管理
-  const [newReplyText,setNewReplyText] = useState('');
-
-
-  //リプライ機能
-  const toggleReply = () =>{
-    setReply(prev => !prev);
-  }
-
-  //リプライのテキストが変更されたら実行
-  const handleChangeReplyText = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setNewReplyText(e.target.value);
-  };
-
-  //新しいリプライメモを追加
+    //新しいメモを追加
   const handleAddMemo = () =>{
     if (newMemoText.trim() === '') {
       return; //空メモ回避
@@ -60,6 +42,31 @@ export const Memo = () => {
     setMemos(prevMemos => [...prevMemos, newMemo]);
     setNewMemoText(''); // テキストエリアをクリア
   }
+
+  //メモの削除機能
+  const deleteMemo = (id: number) => {
+    setMemos(prevMemos => prevMemos.filter(memo => memo.id !== id));
+  };
+
+  //リプライエリアの表示管理
+  const [reply,setReply] = useState(false);
+
+  //リプライコメント用の配列管理
+  const [replyArray,setReplyArray] = useState<ReplyItem[]>([]);
+
+  //リプライのテキストを管理
+  const [newReplyText,setNewReplyText] = useState('');
+
+
+  //リプライ機能
+  const toggleReply = () =>{
+    setReply(prev => !prev);
+  }
+
+  //リプライのテキストが変更されたら実行
+  const handleChangeReplyText = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setNewReplyText(e.target.value);
+  };
 
   //新しいリプライを追加
   const handleAddReply = () =>{
@@ -75,6 +82,11 @@ export const Memo = () => {
     setReplyArray(prevReplyArray => [...prevReplyArray, newReply]); 
     setNewReplyText('');
   }
+
+    //リプライメモの削除機能
+  const deleteReplyMemo = (id: number) => {
+    setReplyArray(prevReplyArray => prevReplyArray.filter(replyArray => replyArray.id !== id));
+  };
 
 
 
@@ -98,7 +110,7 @@ export const Memo = () => {
               <p className="text-sm text-gray-500">{memo.createdAt}</p>
               <div className="flex">
                 <button className="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"><GoPencil className="lucide lucide-pen w-4 h-4" /></button>
-                <button className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors"><CiTrash /></button>
+                <button onClick={() => deleteMemo(memo.id)} className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors"><CiTrash /></button>
               </div>
             </div>  
             <p className="mt-6 whitespace-pre-wrap text-gray-700">{memo.text}</p>
@@ -111,7 +123,7 @@ export const Memo = () => {
                     <p>{array.createdAt}</p>
                     <div>
                       <button className="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"><GoPencil className="lucide lucide-pen w-4 h-4" /></button>
-                      <button className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors"><CiTrash /></button>
+                      <button onClick={() => deleteReplyMemo(array.id)} className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors"><CiTrash /></button>
                     </div>
                   </div>
                   <p className="mt-6 whitespace-pre-wrap text-gray-700">{array.text}</p>
