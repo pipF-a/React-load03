@@ -1,9 +1,9 @@
 
 // import { useState } from 'react';
 import './App.css'
-import { Header } from './components/Header'
+import { Header } from './components/Header/Header'
 // import { InputArea } from './components/InputArea'
-import { Memo } from './components/Memo'
+import { Memo } from './components/Memo/Memo'
 
 function App() {
   // const [items, setItems] = useState<number[]>([]);
@@ -24,11 +24,6 @@ function App() {
       <Header/>
       <main className='p-14'>
         <Memo/>
-        {/* <InputArea value={textContent}  onClick={handleAddItem} /> */}
-        {/* <Memo   
-        items={items} 
-        newItemContent={newItemCount} /> */}
-
       </main>
     </>
   )
