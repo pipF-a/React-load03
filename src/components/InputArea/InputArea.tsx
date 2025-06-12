@@ -1,8 +1,8 @@
 import { IoIosSend } from "react-icons/io";
 
 interface InputAreaProps {
-  value:string;
-  onClick: (itemToAdd: number) => void;
+  value: string;
+  onClick: () => void;
 }
 
 export const InputArea:React.FC<InputAreaProps> = ({onClick,value}) => {
